@@ -1,25 +1,35 @@
-from sklearn.kernel_ridge import KernelRidge
+name: GitHub Actions ML Workflow
 
-from misc import (
-    load_data,
-    preprocess_data,
-    train_model,
-    evaluate_model
-)
+on:
+  push:
+    branches:
+      - kernelridge
 
-# Load data
-df = load_data()
+jobs:
+  Explore-GitHub-Actions:
+    runs-on: ubuntu-latest
 
-# Split data
-X_train, X_test, y_train, y_test = preprocess_data(df)
+    strategy:
+      matrix:
+        python-version: ["3.10"]
 
-# Create model
-model = KernelRidge()
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-# Train model
-model = train_model(model, X_train, y_train)
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
 
-# Evaluate
-mse = evaluate_model(model, X_test, y_test)
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
 
-print("Kernel Ridge MSE:", mse)
+      - name: Run Decision Tree
+        run: |
+          python train.py
+
+      - name: Run Kernel Ridge
+        run: |
+          python train2.py
